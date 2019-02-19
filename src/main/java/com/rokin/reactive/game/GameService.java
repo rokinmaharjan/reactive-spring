@@ -5,6 +5,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
@@ -41,12 +42,15 @@ public class GameService {
 		return gameRepository.findById(id);
 	}
 	
-	public Flux<Game> streamGames() {
+	public Flux<ServerSentEvent<Game>> streamGames() {
 		Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
 		
-		Flux<Game> games = Flux.fromStream(Stream.generate(() -> new Game(UUID.randomUUID().toString(), "asf", 500)));
-		
-		return Flux.zip(interval, games).map(Tuple2::getT2);
+		return Flux.interval(Duration.ofSeconds(1))
+				.map(sn -> ServerSentEvent.<Game> builder()
+						.id(String.valueOf(sn))
+						.event("game-event")
+						.data(new Game(UUID.randomUUID().toString(), "DotA2", 500))
+						.build());
 	}
 
 }
