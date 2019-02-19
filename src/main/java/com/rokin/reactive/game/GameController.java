@@ -2,6 +2,7 @@ package com.rokin.reactive.game;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,9 @@ public class GameController {
 	
 	@Autowired
 	private GameService gameService;
+	
+	@Autowired
+	private GameWebClient gameWebClient;
 	
 //	@Bean
 //	RouterFunction<?> routes(GameService gameService) {
@@ -42,7 +46,12 @@ public class GameController {
 	}
 	
 	@GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-	public Flux<Game> streamGames() {
+	public Flux<ServerSentEvent<Game>> streamGames() {
 		return gameService.streamGames();
+	}
+	
+	@GetMapping(value = "/stream/consume")
+	public void consumeGameStream() {
+		gameWebClient.consumeGameServerSentEvents();
 	}
 }
