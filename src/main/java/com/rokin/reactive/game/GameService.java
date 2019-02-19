@@ -2,7 +2,6 @@ package com.rokin.reactive.game;
 
 import java.time.Duration;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.codec.ServerSentEvent;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 
 @Service
 public class GameService {
@@ -43,8 +41,6 @@ public class GameService {
 	}
 	
 	public Flux<ServerSentEvent<Game>> streamGames() {
-		Flux<Long> interval = Flux.interval(Duration.ofSeconds(1));
-		
 		return Flux.interval(Duration.ofSeconds(1))
 				.map(sn -> ServerSentEvent.<Game> builder()
 						.id(String.valueOf(sn))
